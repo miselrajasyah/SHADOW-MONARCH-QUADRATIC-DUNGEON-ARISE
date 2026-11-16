@@ -1,0 +1,143 @@
+rules_version = '2';
+// Aturan keamanan Cloud Firestore untuk Shadow Monarch's Quadratic Dungeon.
+// Tempel di Firebase Console > Firestore Database > Rules > Publish.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function isOwner(uid) { return signedIn() && request.auth.uid == uid; }
+    function isTeacher() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'teacher';
+    }
+    // Nama hunter milik akun yang sedang login (diambil dari dokumen users miliknya).
+    function myName() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.name;
+    }
+    // Opsional: wajibkan email terverifikasi. Tambahkan "&& request.auth.token.email_verified" pada isOwner jika REQUIRE_VERIFIED = true.
+
+    // Data lengkap akun. Pemilik dan guru boleh membaca. Hanya pemilik yang menulis.
+    match /users/{uid} {
+      allow read: if isOwner(uid) || isTeacher();
+      // Buat akun: siswa bebas; guru harus membawa kode yang sama dengan config/app.teacherCode.
+      allow create: if isOwner(uid)
+        && request.resource.data.uid == uid
+        && (request.resource.data.role == 'student'
+            || (request.resource.data.role == 'teacher'
+                && request.resource.data.teacherCode == get(/databases/$(database)/documents/config/app).data.teacherCode));
+      // Ubah data: role, nama, dan uid tidak boleh berubah.
+      allow update: if isOwner(uid)
+        && request.resource.data.role == resource.data.role
+        && request.resource.data.name == resource.data.name
+        && request.resource.data.uid == uid;
+      allow delete: if false;
+    }
+
+    // Ringkasan publik siswa untuk halaman Peringkat (tanpa jawaban soal).
+    match /leaderboard/{uid} {
+      allow read: if signedIn();
+      allow create, update: if isOwner(uid)
+        && request.resource.data.uid == uid
+        && request.resource.data.role == 'student';
+      allow delete: if false;
+    }
+
+    // Daftar nama hunter yang sudah dipakai (mencegah nama kembar). Cek ketersediaan boleh sebelum login.
+    match /names/{key} {
+      allow get: if true;
+      allow list: if false;
+      allow create: if signedIn() && request.resource.data.uid == request.auth.uid;
+      allow update, delete: if false;
+    }
+
+    /* ================= TAHAP 2 ================= */
+
+    // FORUM: topik. Semua akun login membaca. Menulis topik atas nama sendiri.
+    // Update: siapa pun hanya boleh menambah atau mencabut NAMANYA SENDIRI di array likes; guru boleh menyematkan (pin).
+    match /forum/{tid} {
+      allow read: if signedIn();
+      allow create: if signedIn()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.by == myName()
+        && request.resource.data.title is string && request.resource.data.title.size() >= 3 && request.resource.data.title.size() <= 90
+        && request.resource.data.body is string && request.resource.data.body.size() >= 5 && request.resource.data.body.size() <= 1000
+        && request.resource.data.likes == []
+        && request.resource.data.pin == false;
+      allow update: if signedIn() && (
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likes'])
+          && request.resource.data.likes is list
+          && ((request.resource.data.likes.size() == resource.data.likes.size() + 1
+                && request.resource.data.likes.hasAny([myName()]) && !resource.data.likes.hasAny([myName()]))
+              || (request.resource.data.likes.size() == resource.data.likes.size() - 1
+                && resource.data.likes.hasAny([myName()]) && !request.resource.data.likes.hasAny([myName()]))))
+        || (isTeacher() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['pin']))
+      );
+      allow delete: if isTeacher() || (signedIn() && resource.data.uid == request.auth.uid);
+    }
+
+    // FORUM: balasan. best (jawaban terbaik) hanya boleh diubah guru atau penulis topik.
+    match /forumReplies/{rid} {
+      allow read: if signedIn();
+      allow create: if signedIn()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.by == myName()
+        && request.resource.data.tid is string
+        && request.resource.data.body is string && request.resource.data.body.size() >= 2 && request.resource.data.body.size() <= 1000
+        && request.resource.data.likes == []
+        && request.resource.data.best == false;
+      allow update: if signedIn() && (
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likes'])
+          && request.resource.data.likes is list
+          && ((request.resource.data.likes.size() == resource.data.likes.size() + 1
+                && request.resource.data.likes.hasAny([myName()]) && !resource.data.likes.hasAny([myName()]))
+              || (request.resource.data.likes.size() == resource.data.likes.size() - 1
+                && resource.data.likes.hasAny([myName()]) && !request.resource.data.likes.hasAny([myName()]))))
+        || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['best'])
+            && (isTeacher()
+                || get(/databases/$(database)/documents/forum/$(resource.data.tid)).data.uid == request.auth.uid))
+      );
+      allow delete: if isTeacher()
+        || (signedIn() && resource.data.uid == request.auth.uid)
+        || (signedIn() && exists(/databases/$(database)/documents/forum/$(resource.data.tid))
+            && get(/databases/$(database)/documents/forum/$(resource.data.tid)).data.uid == request.auth.uid);
+    }
+
+    // PENGUMUMAN: dibaca semua akun login, hanya guru yang membuat atau menghapus.
+    match /announcements/{aid} {
+      allow read: if signedIn();
+      allow create: if isTeacher()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.by == myName()
+        && request.resource.data.text is string && request.resource.data.text.size() >= 3 && request.resource.data.text.size() <= 300;
+      allow update: if false;
+      allow delete: if isTeacher();
+    }
+
+    // PENGATURAN: dokumen settings/raid (waktu per soal dan jumlah soal). Dibaca semua, ditulis guru.
+    match /settings/{doc} {
+      allow read: if signedIn();
+      allow write: if isTeacher() && doc == 'raid'
+        && request.resource.data.raidSec is int && request.resource.data.raidSec >= 20 && request.resource.data.raidSec <= 300
+        && request.resource.data.raidN is int && request.resource.data.raidN >= 3 && request.resource.data.raidN <= 20;
+    }
+
+    // PROFIL PUBLIK: avatar (rakitan atau foto Base64 kecil) agar tampil di forum dan peringkat. Hanya pemilik yang menulis.
+    match /profiles/{uid} {
+      allow read: if signedIn();
+      allow create, update: if isOwner(uid)
+        && request.resource.data.uid == uid
+        && request.resource.data.name == myName()
+        && request.resource.data.role == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role
+        && (!('av' in request.resource.data) || request.resource.data.av == null || request.resource.data.av.size() <= 12)
+        && (!('ph' in request.resource.data) || request.resource.data.ph == null
+            || (request.resource.data.ph is string && request.resource.data.ph.size() <= 45000));
+      allow delete: if false;
+    }
+
+    // Pengaturan rahasia (kode guru). Tidak bisa dibaca atau ditulis dari browser; isi lewat Firebase Console.
+    match /config/{doc} {
+      allow read, write: if false;
+    }
+  }
+}

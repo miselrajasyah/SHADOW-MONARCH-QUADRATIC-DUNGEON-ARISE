@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="theme-color" content="#070a1c" />
+    <meta
+      name="description"
+      content="E-learning fungsi kuadrat interaktif bertema Solo Leveling: dungeon, raid waktu, forum, dan karakter."
+    />
+    <meta property="og:title" content="Shadow Monarch's Quadratic Dungeon" />
+    <meta
+      property="og:description"
+      content="Taklukkan 6 dungeon fungsi kuadrat dari Rank E sampai S."
+    />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" type="image/svg+xml" href="icons/logo.svg" />
+    <link rel="alternate icon" href="icons/icon-192.png" />
+    <link rel="apple-touch-icon" href="icons/icon-192.png" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Shadow Monarch's Quadratic Dungeon</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Rajdhani:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- KaTeX (notasi matematika). Versi dikunci dan diberi integrity agar aman. -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/katex@0.16.47/dist/katex.min.css"
+      integrity="sha384-nH0MfJ44wi1dd7w6jinlyBgljjS8EJAh2JBoRad8a3VDw2K69vfaaqm4WnR+gXtA"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/v11.css" />
+  </head>
+  <body>
+    <!-- LAYAR PEMBUKA: dikelola oleh splashInit() di extras.js. Matikan lewat SPLASH = false di content.js -->
+    <div id="splash">
+      <div class="splbox">
+        <svg class="ico splogo" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-logo" /></svg>
+        <div id="splt"></div>
+        <p id="splk" hidden>Ketuk layar atau tekan Enter untuk masuk</p>
+        <small>Lewati: Esc</small>
+      </div>
+    </div>
+    <!-- Kanvas animasi titik cahaya di latar (digambar oleh app.js bagian PARTIKEL) -->
+    <canvas id="fx"></canvas>
+    <!-- Kanvas konfeti (digambar oleh burst() di extras.js) -->
+    <canvas id="cf"></canvas>
+    <!-- LANDING PAGE: isinya dibuat oleh fungsi SITE() di app.js, teksnya ada di content.js (TXT, TIM, FAQ) -->
+    <div id="site"></div>
+    <!-- JENDELA MASUK / DAFTAR (muncul saat tombol Masuk atau Daftar ditekan).
+         Mengubah tulisan label di sini aman. Jangan ubah atribut id karena dipakai oleh app.js. -->
+    <div id="authm" hidden>
+      <form class="sys" id="login" novalidate>
+        <button type="button" id="ax" class="x" aria-label="Tutup">×</button>
+        <small class="tag">[ SYSTEM ] IDENTIFIKASI HUNTER</small>
+        <div class="tabs" id="modes">
+          <button type="button" class="on" data-m="login">Masuk</button
+          ><button type="button" data-m="register">Daftar</button>
+        </div>
+        <p class="mut sm" id="rsh" hidden>
+          Masukkan email akunmu. Kami kirim link untuk membuat password baru.
+        </p>
+        <!-- v11: pilihan peran tampil di tab Masuk dan Daftar. Teks tombol diatur oleh syncAuth() di app.js. -->
+        <div id="rw">
+          <div class="tabs roles" id="roles" role="tablist" aria-label="Peran" style="margin-top: 10px">
+            <button type="button" role="tab" class="on" data-r="student">Masuk sebagai Hunter (Siswa)</button
+            ><button type="button" role="tab" data-r="teacher">Masuk sebagai God / Guild Master (Guru)</button>
+          </div>
+        </div>
+        <label id="nmw" hidden
+          >Nama hunter<input
+            id="nm"
+            placeholder="Nama yang tampil di peringkat"
+            maxlength="24"
+            autocomplete="nickname"
+        /></label>
+        <label
+          >Email<input
+            id="em"
+            type="email"
+            placeholder="nama@email.com"
+            autocomplete="email"
+            inputmode="email"
+        /></label>
+        <label id="pww"
+          >Password<input
+            id="pw"
+            type="password"
+            placeholder="Minimal 6 karakter"
+            autocomplete="current-password"
+        /></label>
+        <label id="cdw" hidden
+          >Kode guru<input id="cd" type="password" placeholder="Kode guild"
+        /></label>
+        <button class="btn" id="sb">Masuk</button>
+        <p class="forgot"><a id="fgt" role="button" tabindex="0">Lupa password?</a></p>
+        <p class="err" id="er" role="alert"></p>
+        <p class="okm" id="okm" role="status"></p>
+        <!-- Tombol demo hanya tampil di MODE PEMILIK (lihat extras.js bagian 9). Akun demo hanya ada di perangkat ini. -->
+        <div class="demo owner-only">
+          <button type="button" data-d="s">Demo siswa: Misel</button
+          ><button type="button" data-d="t">Demo guru</button>
+        </div>
+        <p class="mut sm">
+          Akunmu disimpan di cloud (Firebase), jadi progres sama saat dibuka dari HP maupun
+          laptop. Setelah daftar, kami kirim link verifikasi ke emailmu.
+        </p>
+        <p class="mut sm owner-only">
+          Mode pemilik aktif. Kode guru ada di TEACHER_CODE (content.js) dan harus sama dengan
+          teacherCode di Firestore (config/app).
+        </p>
+      </form>
+    </div>
+    <!-- GERBANG VERIFIKASI EMAIL: hanya muncul jika REQUIRE_VERIFIED = true (content.js) dan email belum diverifikasi -->
+    <div id="vgate" hidden>
+      <div class="sys">
+        <small class="tag">[ SYSTEM ] VERIFIKASI EMAIL</small>
+        <h2>Cek emailmu</h2>
+        <p class="mut">
+          Kami mengirim link verifikasi ke <b id="vge"></b>. Klik link itu (cek juga folder Spam),
+          lalu tekan tombol di bawah.
+        </p>
+        <p class="vact">
+          <button class="btn" id="vgc">Saya sudah verifikasi</button>
+          <button class="btn ghost" id="vgs">Kirim ulang link</button>
+          <button class="btn ghost" id="vgo">Keluar</button>
+        </p>
+        <p class="err" id="vger"></p>
+        <p class="okm" id="vgok"></p>
+      </div>
+    </div>
+    <!-- AREA SETELAH LOGIN: menu atas (#nav) dan isi halaman (#view) diisi otomatis oleh app.js -->
+    <div id="app" hidden>
+      <header class="top">
+        <b class="brand"><svg class="ico blogo" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-logo" /></svg>ARISE<span>//DUNGEON</span></b>
+        <nav id="nav"></nav>
+        <div class="me">
+          <div class="lgsw" data-lgslot="app"></div>
+          <span id="cst" class="cs" hidden></span><span id="who"></span
+          ><button class="btn ghost" id="out">Keluar</button>
+        </div>
+      </header>
+      <!-- Pita pengingat verifikasi email (tampil jika email belum diverifikasi) -->
+      <div id="vbar" class="vbar" hidden>
+        <span>Email <b id="vbe"></b> belum diverifikasi.</span>
+        <button class="btn ghost" id="vbs">Kirim link verifikasi</button>
+        <button class="btn ghost" id="vbc">Saya sudah verifikasi</button>
+      </div>
+      <main id="view"></main>
+    </div>
+    <!-- KONTROL AUDIO (Tahap 3): Musik (mute/unmute), Suasana musik (BGM), Suara karakter (Voice Over), Teman, SFX, volume.
+         Isi tombol (ikon + tulisan) diisi oleh Aud.sync() di audio3.js. Jangan ubah atribut id. -->
+    <div id="audio">
+      <button id="bm" type="button" title="Musik: nyalakan atau matikan">Musik: OFF</button
+      ><button id="bmood" type="button" title="Suasana musik" aria-haspopup="true">Suasana</button
+      ><button id="bvo" type="button" title="Voice Over karakter">Suara: ON</button
+      ><button id="bc" type="button" title="Tampilkan atau sembunyikan teman pendamping">Teman: ON</button>
+      <button id="bs" type="button" title="Efek suara">SFX: ON</button
+      ><input id="bv" type="range" min="0" max="100" value="55" title="Volume" aria-label="Volume" />
+      <div id="bmenu" class="bmenu" hidden role="menu"></div>
+    </div>
+    <!-- #toast = pesan kecil, #ovl = layar LEVEL UP. Dikelola oleh app.js -->
+    <!-- TEMAN PENDAMPING: karakter + gelembung ucapan (diatur oleh characters.js) -->
+    <div id="co" hidden>
+      <div id="cob" class="bubble" hidden></div>
+      <div id="cof" class="cofig" title="Klik aku!"></div>
+    </div>
+    <div id="toast"></div>
+    <div id="ovl" hidden></div>
+    <!-- content.js harus dimuat lebih dulu karena berisi data yang dipakai app.js -->
+    <!-- Tahap 3: ikon SVG dan Tim Pengembang dimuat paling awal karena dipakai saat halaman pertama digambar -->
+    <script src="js/icons.js"></script>
+    <script src="js/content.js"></script>
+    <script src="js/team.js"></script>
+    <script src="js/characters.js"></script>
+    <script src="js/extras.js"></script>
+    <!-- Tahap 2: modul materi visual, panduan istilah, avatar, dan sinkronisasi forum/pengumuman/raid. Dimuat sebelum app.js. -->
+    <script src="js/materi.js"></script>
+    <script src="js/glossary.js"></script>
+    <script src="js/avatar.js"></script>
+    <script src="js/sync.js"></script>
+    <!-- Tahap 3: kamus 4 bahasa (lang.js) dan mesin penerjemah antarmuka (i18n.js), dimuat sebelum app.js -->
+    <script src="js/lang.js"></script>
+    <script src="js/lang2.js"></script>
+    <script src="js/i18n.js"></script>
+    <script src="js/app.js"></script>
+    <!-- Tahap 3 (setelah app.js): BGM bersuasana dan Voice Over karakter -->
+    <script src="js/audio3.js"></script>
+    <!-- v11: monster unik per Gate, SFX megah, pertempuran + HP Player, peta dungeon visual, menu baru, panel bawah, boot -->
+    <script src="js/monsters.js"></script>
+    <script src="js/sfx11.js"></script>
+    <script src="js/battle11.js"></script>
+    <script src="js/gatemap.js"></script>
+    <script src="js/menus11.js"></script>
+    <script src="js/ui11.js"></script>
+    <script src="js/boot11.js"></script>
+    <!-- Notasi matematika: KaTeX + auto-render. math.js menjalankannya otomatis setiap halaman berubah. -->
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/katex@0.16.47/dist/katex.min.js"
+      integrity="sha384-CwjPRVHTvLiMBFjEoij+QZViMV5rhTOIp7CJzl24JEqpRDA1sJFHVXXLURktbYYp"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/katex@0.16.47/dist/contrib/auto-render.min.js"
+      integrity="sha384-bjyGPfbij8/NDKJhSGZNP/khQVgtHUE5exjm4Ydllo42FwIgYsdLO2lXGmRBf5Mz"
+      crossorigin="anonymous"
+    ></script>
+    <script defer src="js/math.js"></script>
+    <!-- Firebase (Authentication + Firestore) v13.3.0, dimuat sebagai module dari js/firebase.js -->
+    <script src="js/cloud.js"></script>
+    <script type="module" src="js/firebase.js"></script>
+  </body>
+</html>
