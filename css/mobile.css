@@ -1,0 +1,155 @@
+/* ==================================================================
+   mobile.css : PEROMBAKAN TOTAL RESPONSIVE MOBILE (v11.1-mobile-clean)
+   Dimuat PALING AKHIR (setelah style.css dan v11.css), jadi menang atas semua aturan lama.
+   Hanya berlaku di layar <= 768px. Desktop tidak berubah.
+   Pasangan: js/mobile11.js (memindahkan menu, memasang pembungkus tabel, menyembunyikan maskot saat mengetik).
+   ================================================================== */
+@media (max-width: 768px) {
+  :root { --hdr: 56px; --nav: 46px; --safe-b: env(safe-area-inset-bottom, 0px); }
+  html, body { max-width: 100%; overflow-x: hidden; -webkit-text-size-adjust: 100%; }
+  body { font-size: calc(16px * var(--fs, 1)); line-height: 1.35; }
+  body::before { animation: none; }
+
+  /* ---------- 1. HEADER 56px + MENU SATU BARIS ---------- */
+  #app > .top {
+    display: flex; flex-wrap: nowrap; align-items: center; gap: 8px;
+    height: var(--hdr); min-height: 0; max-height: var(--hdr); padding: 0 10px; overflow: hidden;
+  }
+  #app > .top .brand { flex: 0 0 auto; display: flex; align-items: center; font-size: 15px; letter-spacing: 2px; white-space: nowrap; }
+  #app > .top .brand span { display: none; }
+  #app > .top .brand .blogo { width: 28px; height: 28px; margin-right: 6px; }
+  #app > .top .me { margin-left: auto; flex: 0 1 auto; min-width: 0; gap: 6px; flex-wrap: nowrap; align-items: center; }
+  #app > .top .me #who { display: inline-flex; align-items: center; font-size: 0; flex: none; }
+  #app > .top .me #who .whoav { font-size: 14px; display: inline-flex; }
+  #app > .top .me .cs { display: none; }
+  #app > .top .me .lgsw { margin: 0; }
+  #app > .top .me .lgb { padding: 4px 8px; font-size: 13px; gap: 4px; height: 34px; }
+  #app > .top .me .lgb .flag { width: 20px; height: 14px; }
+  #app > .top .me #out { padding: 0 10px; height: 34px; min-height: 0; font-size: 12px; letter-spacing: 1px; line-height: 1; white-space: nowrap; }
+  #app > .top .me #glf { position: static; width: 34px; height: 34px; font-size: 16px; flex: none; box-shadow: none; }
+  .lgm { position: fixed; right: 8px; left: auto; top: calc(var(--hdr) + 4px); max-width: calc(100vw - 16px); }
+
+  /* Menu: baris horizontal yang bisa digeser, menempel di bawah header (dipindah oleh mobile11.js) */
+  #app > #nav, #nav {
+    display: flex; flex-wrap: nowrap; flex: none; width: 100%; order: 0;
+    overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+    gap: 4px; padding: 5px 10px; height: var(--nav); align-items: center;
+    background: rgba(7, 10, 28, 0.92); border-bottom: 1px solid rgba(77, 139, 255, 0.25);
+  }
+  #app > #nav { position: sticky; top: var(--hdr); z-index: 4; }
+  #nav::-webkit-scrollbar { display: none; }
+  #nav a { flex: 0 0 auto; white-space: nowrap; padding: 0 14px; height: 34px; display: inline-flex; align-items: center; font-size: 15px; }
+  .vbar { position: static; padding: 8px 12px; gap: 6px; }
+
+  /* ---------- 2. KONTEN: SATU KOLOM, TIDAK TERHIMPIT ---------- */
+  #view { padding: 12px 12px calc(84px + var(--safe-b)); gap: 14px; max-width: 100%; display: grid; grid-template-columns: minmax(0, 1fr); }
+  #view > * { min-width: 0; max-width: 100%; }
+  #view .grid2, #view .grid3, #view .grid4, #view .sys .grid3, #view .steps, #view .two, #view .tri3,
+  #view .lhero, #view .fills, #view .ladder, #view .shgrid, #view .tmgrid, #view .mgrid, #view .cgrid,
+  #auth {
+    display: grid; grid-template-columns: minmax(0, 1fr); width: 100%; gap: 12px;
+  }
+  #view .ladder { gap: 10px; }
+  .battle, .battle.v11 { display: flex; flex-direction: column; gap: 12px; }
+  .battle.v11 .bpl { border-left: 0; border-top: 1px dashed #2a3a80; padding: 10px 0 0; }
+  .battle.v11 .bmon { flex-direction: row; }
+  .sys, .card, .rank, .chcard, .tmcard, .shcard, .gpanel, .ach, .mhc, .stat, .monintro, .raidhud, .opts label, .ringkas {
+    min-width: 0; max-width: 100%; overflow-wrap: break-word; word-wrap: break-word; word-break: normal; hyphens: auto;
+  }
+  .sys, .card { padding: 14px; border-radius: 12px; }
+  .grid2 > *, .grid3 > *, .grid4 > *, .ladder > *, .tmgrid > *, .two > *, .tri3 > *, .steps > * { min-width: 0; }
+  .card.stat, .stat { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 12px 14px; text-align: left; }
+  #view .sys .grid3 { gap: 2px; }
+  .sys .stat { padding: 6px 2px; background: none; border: 0; box-shadow: none; }
+  .stat b { font-size: 24px; flex: none; }
+  .stat span { text-align: right; }
+  h1 { font-size: 26px; line-height: 1.15; overflow-wrap: break-word; }
+  h2 { font-size: 21px; line-height: 1.2; overflow-wrap: break-word; }
+  h3 { font-size: 18px; overflow-wrap: break-word; }
+  .big { font-size: 32px; }
+  .mhs { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .simhero, .monintro, .gpanel, .ach { flex-wrap: wrap; }
+  .opts label { padding: 12px; min-height: 44px; }
+  .ctl { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  button, .btn, select, input, textarea { max-width: 100%; }
+  input, select, textarea { font-size: 16px; min-width: 0; }
+  .btn { min-height: 42px; }
+
+  /* Tabel: dibungkus .tblw oleh mobile11.js agar bisa digeser */
+  .tblw, .scrl { display: block; width: 100%; max-width: 100%; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; }
+  .tblw > table, .scrl > table { width: max-content; min-width: 100%; }
+  th, td { padding: 8px 10px; white-space: nowrap; }
+  td:first-child, th:first-child { white-space: normal; min-width: 90px; }
+  table:not(.tblw > table):not(.scrl > table) { display: block; max-width: 100%; overflow-x: auto; }
+
+  /* ---------- 3. WIDGET MELAYANG: TANPA TUMPANG TINDIH ---------- */
+  /* Panel audio: kiri bawah, otomatis ringkas (satu tombol) */
+  #audio { left: 10px; right: auto; bottom: calc(10px + var(--safe-b)); max-width: calc(100vw - 20px); z-index: 20; }
+  #audio.min { width: 44px; height: 44px; padding: 0; border-radius: 50%; justify-content: center; align-items: center; opacity: 0.88; }
+  #audio.min .abx { width: 40px; height: 40px; }
+  #audio:not(.min) { left: 8px; right: 8px; bottom: calc(8px + var(--safe-b)); max-width: none; width: auto; border-radius: 20px; padding: 8px; justify-content: flex-start; gap: 6px; }
+  #audio:not(.min) button { min-height: 38px; }
+  #audio:not(.min) input#bv { flex: 1 1 100px; min-width: 80px; }
+  #audio .bmenu { left: 0; right: 0; bottom: calc(100% + 8px); max-height: 50vh; overflow-y: auto; }
+  /* Maskot: 52px kanan bawah, sembunyi saat mengetik / di arena soal */
+  #co { left: auto; right: 10px; bottom: calc(10px + var(--safe-b)); flex-direction: column; align-items: flex-end; gap: 6px; z-index: 15; }
+  #co .cofig { width: 52px; height: 52px; }
+  #co .cofig svg { width: 100%; height: 100%; }
+  #co .bubble { max-width: min(240px, calc(100vw - 90px)); margin: 0; font-size: 14px; padding: 8px 10px; pointer-events: none; }
+  body.typing #co, body.arena #co { display: none !important; }
+  /* "?" Kamus Istilah: di header saat login; di landing melayang tepat di atas panel audio */
+  #glf { left: 10px; right: auto; bottom: calc(62px + var(--safe-b)); width: 38px; height: 38px; font-size: 17px; z-index: 19; opacity: 0.92; }
+  .me #glf { position: static; }
+  body.typing #audio, body.typing #glf:not(.inhdr) { display: none; }
+  #toast { left: 10px; right: 10px; bottom: calc(66px + var(--safe-b)); z-index: 30; pointer-events: none; }
+  #sysw { top: calc(var(--hdr) + var(--nav) + 6px); }
+
+  /* Landing: bar atas ringkas */
+  .snav { height: var(--hdr); max-height: var(--hdr); padding: 0 10px; gap: 6px; flex-wrap: nowrap; overflow: visible; }
+  .snav .brand span { display: none; }
+  .snav .sauth { gap: 6px; flex-wrap: nowrap; }
+  .snav .sauth .btn, .snav .btn { padding: 0 12px; height: 36px; min-height: 0; font-size: 13px; letter-spacing: 1px; white-space: nowrap; }
+  .snav .lgb { padding: 4px 8px; height: 36px; }
+  #site section, #site .sec, #site .wrap { max-width: 100%; min-width: 0; }
+  #site .lhero { gap: 16px; }
+  #site h1 { font-size: clamp(34px, 12vw, 56px); }
+  .cta, .lcta { display: flex; flex-direction: column; align-items: stretch; gap: 10px; }
+
+  /* Modal masuk/daftar & kamus */
+  #authm { padding: 10px; align-items: flex-start; overflow-y: auto; }
+  #authm .sys { width: 100%; max-width: 100%; }
+  .glbox { padding: 16px; max-height: 88vh; }
+  .v11box { max-height: 88vh; }
+  .tabs { flex-wrap: wrap; }
+
+  /* ---------- 4. KANVAS, SVG, KATEX RESPONSIF ---------- */
+  #view canvas, #view .simgraph, #view .simgraph svg, #view .gfig, #view figure, #view .mon-svg, #view .bigmon svg, #view .bfig svg, #view .avbig svg {
+    max-width: 100%; height: auto;
+  }
+  #view canvas { display: block; }
+  #view iframe, #view .ggbw, #view [id^='ggb'] { max-width: 100%; }
+  .gmapw { overflow-x: hidden; border-radius: 12px; }
+  .gmapsvg { min-width: 0; width: 100%; max-width: 100%; height: auto; }
+  .gmapsvg .glab { font-size: 22px; stroke-width: 6px; }
+  .gmapsvg .glab.sm { font-size: 18px; }
+  .gmapsvg .gsub { display: none; }
+  .gmapsvg .gcompass { display: none; }
+  .glegend { gap: 8px 12px; font-size: 13px; }
+  .katex-display { max-width: 100%; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; padding-bottom: 2px; }
+  .katex { max-width: 100%; }
+  .eq, .ans, .opts label span { max-width: 100%; overflow-wrap: anywhere; }
+  .eq { overflow-x: auto; }
+  pre, code { max-width: 100%; overflow-x: auto; white-space: pre-wrap; word-break: break-word; }
+
+  /* Tim pengembang */
+  .tmgrid { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .tmcard, .tmcard.master { grid-column: 1 / -1; }
+  .tmhead { flex-direction: column; text-align: center; }
+  .tmfoot { flex-wrap: wrap; }
+  .tmban { flex-direction: column; }
+}
+@media (max-width: 380px) {
+  #app > .top .brand b, #app > .top .brand { letter-spacing: 1px; font-size: 14px; }
+  #app > .top .me #out { padding: 0 8px; font-size: 11px; }
+  #app > .top .me .lgb .lgc { display: none; }
+}

@@ -64,3 +64,7 @@ V11 FINAL (10 penyempurnaan)
     Jika foto belum ada, bingkai perisai otomatis memakai lencana SVG.
 Cache service worker: arise-v11.
 Catatan: kondisi pertempuran (HP, perisai) tersimpan di browser tiap perangkat (localStorage), pasukan bayangan dihitung dari progres akun.
+
+== v11.1-mobile-clean ==
+Perombakan responsive HP: css/mobile.css (dimuat terakhir) dan js/mobile11.js. Service worker: arise-v11-1.
+Hanya aktif di layar <= 768px; tampilan laptop tidak berubah.

@@ -1,12 +1,13 @@
 /* sw.js : service worker agar website bisa dipasang sebagai aplikasi dan tetap terbuka saat offline.
    Strategi: ambil dari jaringan dulu, jika gagal pakai salinan tersimpan. GeoGebra tetap butuh internet.
    Ubah VERSI jika kamu mengedit file agar cache lama diganti. */
-const VERSI = 'arise-v11';
+const VERSI = 'arise-v11-1';
 const FILES = [
   './',
   'index.html',
   'css/style.css',
   'css/v11.css',
+  'css/mobile.css',
   'js/icons.js',
   'js/content.js',
   'js/team.js',
@@ -28,6 +29,7 @@ const FILES = [
   'js/menus11.js',
   'js/ui11.js',
   'js/boot11.js',
+  'js/mobile11.js',
   'js/math.js',
   'js/cloud.js',
   'js/firebase.js',

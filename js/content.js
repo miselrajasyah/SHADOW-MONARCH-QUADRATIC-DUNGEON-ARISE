@@ -747,7 +747,7 @@ const TXT = {
   charsDesc: 'Gerakkan kursor atau jarimu, mata mereka mengikuti! Klik karakter untuk berkenalan.',
   timTitle: 'Tim Pengembang', // data anggota ada di daftar TIM (di atas)
   faqTitle: 'FAQ', // pertanyaan ada di daftar FAQ di bawah
-  footer: 'May the Math be with You | Akun dan progres tersinkronisasi lewat Firebase.',
+  footer: 'Pendidikan Matematika | Akun dan progres tersinkronisasi lewat Firebase.',
 };
 
 /* ============================================================
