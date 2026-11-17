@@ -174,7 +174,7 @@ const Q = {
     {
       t: 'mc',
       tag: 'MULTIPLE QUESTION',
-      q: 'Irsyah, product manager aplikasi busana, memodelkan profit (ribu dolar) terhadap harga langganan bulanan $x$: $p(x) = -(x - 6)^2 + 20$. Apa interval naik dan turunnya?',
+      q: 'Mauraa, product manager aplikasi busana, memodelkan profit (ribu dolar) terhadap harga langganan bulanan $x$: $p(x) = -(x - 6)^2 + 20$. Apa interval naik dan turunnya?',
       o: [
         'Naik $(-\\infty, 6)$, turun $(6, \\infty)$',
         'Naik $(6, \\infty)$, turun $(-\\infty, 6)$',
