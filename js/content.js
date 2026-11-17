@@ -648,7 +648,7 @@ const SITE_TITLE = "Shadow Monarch's Quadratic Dungeon"; // dipakai sebagai nama
    ============================================================ */
 const TIM_INFO = {
   guild: 'Guild Team 3',
-  course: 'Mata kuliah E-Learning | S1 Pendidikan Matematika',
+  course: 'Mata kuliah E-Learning | Mathematics Education',
   project: "Shadow Monarch's Quadratic Dungeon",
   desc: 'Lima anggota guild merancang, membangun, dan menguji dungeon fungsi kuadrat ini bersama-sama.',
 };
@@ -747,7 +747,7 @@ const TXT = {
   charsDesc: 'Gerakkan kursor atau jarimu, mata mereka mengikuti! Klik karakter untuk berkenalan.',
   timTitle: 'Tim Pengembang', // data anggota ada di daftar TIM (di atas)
   faqTitle: 'FAQ', // pertanyaan ada di daftar FAQ di bawah
-  footer: 'Pendidikan Matematika | Akun dan progres tersinkronisasi lewat Firebase.',
+  footer: 'May the Math be with You | Akun dan progres tersinkronisasi lewat Firebase.',
 };
 
 /* ============================================================
